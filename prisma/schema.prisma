@@ -14,19 +14,92 @@ datasource db {
 }
 
 model User {
-  id         String @id @default(uuid())
-  name       String
-  email      String @unique
-  password   String
-  role       Role
-  contactNo  String
-  address    String
-  profileImg String
+  id               String            @id @default(uuid())
+  name             String
+  email            String            @unique
+  password         String
+  role             Role
+  contactNo        String
+  address          String
+  profileImg       String
+  reviewAndRatings ReviewAndRating[]
+  orders           Order[]
 
   @@map("users")
+}
+
+model Category {
+  id    String @id @default(uuid())
+  title String
+  books Book[]
+
+  @@map("categories")
+}
+
+model Book {
+  id              String @id @default(uuid())
+  title           String
+  author          String
+  price           Float
+  genre           String
+  publicationDate String
+
+  categoryId       String
+  category         Category          @relation(fields: [categoryId], references: [id])
+  reviewAndRatings ReviewAndRating[]
+  orderedBooks     OrderedBook[]
+
+  @@map("books")
+}
+
+model ReviewAndRating {
+  id     String @id @default(uuid())
+  review String
+  rating Int
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id])
+
+  @@map("review_and_ratings")
+}
+
+model Order {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  status       Status        @default(pending)
+  createdAt    DateTime      @default(now())
+  orderedBooks OrderedBook[]
+
+  @@map("orders")
+}
+
+model OrderedBook {
+  id String @id @default(uuid())
+
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id])
+
+  quantity Int
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  @@map("ordered_books")
 }
 
 enum Role {
   customer
   admin
+}
+
+enum Status {
+  pending
+  shipped
+  delivered
 }
