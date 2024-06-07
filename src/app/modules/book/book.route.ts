@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.post("/create-book", auth("admin"), BookController.insertIntoDB);
 
+router.get("/", BookController.getAllFromDB);
+
 export const BookRoutes = router;
