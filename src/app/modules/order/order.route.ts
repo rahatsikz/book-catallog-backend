@@ -7,5 +7,10 @@ const router = express.Router();
 router.post("/create-order", auth("customer"), OrderController.insertIntoDB);
 
 router.get("/", auth("admin", "customer"), OrderController.getAllFromDB);
+router.get(
+  "/:orderId",
+  auth("admin", "customer"),
+  OrderController.getByIdFromDB
+);
 
 export const OrderRoutes = router;
