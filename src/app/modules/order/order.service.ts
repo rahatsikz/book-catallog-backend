@@ -3,6 +3,7 @@ import prisma from "../../../shared/prisma";
 import { IOrder } from "./order.interface";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
+import { Order, Role } from "@prisma/client";
 
 const insertIntoDB = async (userData: JwtPayload | null, orderData: IOrder) => {
   const { status, orderedBooks } = orderData;
@@ -54,6 +55,29 @@ const insertIntoDB = async (userData: JwtPayload | null, orderData: IOrder) => {
   return result;
 };
 
+const getAllFromDB = async (userData: JwtPayload | null): Promise<Order[]> => {
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      id: userData?.userId,
+    },
+  });
+
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const result = await prisma.order.findMany({
+    include: {
+      orderedBooks: true,
+    },
+    where: {
+      userId: isUserExist.role === Role.customer ? isUserExist.id : {},
+    },
+  });
+  return result;
+};
+
 export const OrderService = {
   insertIntoDB,
+  getAllFromDB,
 };
