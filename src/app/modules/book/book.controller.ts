@@ -57,9 +57,31 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await BookService.updateIntoDB(req.params.id, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Book updated successfully",
+    data: result,
+  });
+});
+
+const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await BookService.deleteFromDB(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Book deleted successfully",
+    data: result,
+  });
+});
+
 export const BookController = {
   insertIntoDB,
   getAllFromDB,
   getByCateogryIdFromDB,
   getByIdFromDB,
+  updateIntoDB,
+  deleteFromDB,
 };
