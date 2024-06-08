@@ -100,7 +100,61 @@ const getAllFromDB = async (
   };
 };
 
+const getByCateogryIdFromDB = async (
+  categoryId: string,
+  options: IPaginationOptions
+) => {
+  const { page, size, skip } = paginationHelpers.calculatePagination(options);
+
+  const result = await prisma.book.findMany({
+    where: {
+      category: {
+        id: categoryId,
+      },
+    },
+    include: {
+      category: true,
+    },
+    skip,
+    take: size,
+  });
+
+  const total = await prisma.book.count({
+    where: {
+      category: {
+        id: categoryId,
+      },
+    },
+  });
+
+  const totalPage = Math.ceil(total / size);
+
+  return {
+    meta: {
+      page,
+      size,
+      total,
+      totalPage,
+    },
+    data: result,
+  };
+};
+
+const getByIdFromDB = async (id: string): Promise<Book | null> => {
+  const result = await prisma.book.findUnique({
+    where: {
+      id: id,
+    },
+    include: {
+      category: true,
+    },
+  });
+  return result;
+};
+
 export const BookService = {
   insertIntoDB,
   getAllFromDB,
+  getByCateogryIdFromDB,
+  getByIdFromDB,
 };

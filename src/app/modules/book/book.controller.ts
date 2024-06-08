@@ -30,7 +30,36 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getByCateogryIdFromDB = catchAsync(
+  async (req: Request, res: Response) => {
+    const { categoryId } = req.params;
+    const options = pick(req.query, ["page", "size"]);
+
+    const result = await BookService.getByCateogryIdFromDB(categoryId, options);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Books with associated category data fetched successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
+
+const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await BookService.getByIdFromDB(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Book fetched successfully",
+    data: result,
+  });
+});
+
 export const BookController = {
   insertIntoDB,
   getAllFromDB,
+  getByCateogryIdFromDB,
+  getByIdFromDB,
 };
